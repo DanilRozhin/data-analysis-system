@@ -14,17 +14,36 @@ class DeviceService:
         self.user_repo = UserRepository(session=session)
 
     async def get_device(self, device_id: uuid.UUID) -> DeviceResponse:
-        device = await self.device_repo.get_device(device_id=device_id)
-        if not device:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Device not found")
-        return device
+        try:
+            device = await self.device_repo.get_device(device_id=device_id)
+            if not device:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Device with id = {device_id} not found"
+                )
+            return device
 
-    async def create_device(self, user_id: uuid.UUID, device_name: str) -> DeviceResponse:
+        except HTTPException:
+            raise
+
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error"
+            ) from e
+
+    async def create_device(
+        self, user_id: uuid.UUID, device_name: str, device_description: str | None = None
+    ) -> DeviceResponse:
         try:
             user = await self.user_repo.get_user(user_id)
             if not user:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-            return await self.device_repo.create_device(user_id=user_id, device_name=device_name)
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id = {user_id} not found")
+            return await self.device_repo.create_device(
+                user_id=user_id, device_name=device_name, device_description=device_description
+            )
+
+        except HTTPException:
+            raise
+
         except SQLAlchemyError as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error"

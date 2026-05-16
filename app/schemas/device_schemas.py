@@ -10,6 +10,10 @@ class DeviceBase(BaseModel):
         description="User name",
     )
     user_id: uuid.UUID = Field(..., description="User (Device owner) ID")
+    description: str | None = Field(
+        default=None,
+        description="Device description",
+    )
 
 
 class DeviceCreate(DeviceBase):
@@ -28,10 +32,6 @@ class DeviceResponse(DeviceBase):
     last_reading_at: datetime.datetime | None = Field(
         ...,
         description="Last Time when the Device got reading",
-    )
-    description: str | None = Field(
-        ...,
-        description="Device description",
     )
 
     model_config = ConfigDict(from_attributes=True)

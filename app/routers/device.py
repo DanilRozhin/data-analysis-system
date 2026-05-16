@@ -29,7 +29,7 @@ async def get_device(
 
     except HTTPException:
         logger.error(
-            f"Failed to get device with uuid = {device_id}",
+            f"Failed to get device with uuid = {device_id}, device not found",
             exc_info=False,
             extra={
                 "error_message": "Not found",
@@ -56,14 +56,16 @@ async def create_device(
     logger.debug(f"(router) Creating new device with name = {request.name} and user_id = {request.user_id}")
     try:
         device_service = DeviceService(session=session)
-        device = await device_service.create_device(device_name=request.name, user_id=request.user_id)
+        device = await device_service.create_device(
+            device_name=request.name, user_id=request.user_id, device_description=request.description
+        )
         logger.debug(f"(router) Created device with name = {request.name} and user_id = {request.user_id}")
         return device
 
     except HTTPException as e:
         if e.status_code == 404:
             logger.error(
-                f"Failed to get user with uuid = {request.user_id}",
+                f"Failed to get user with uuid = {request.user_id}, device not found",
                 exc_info=False,
                 extra={
                     "error_message": "Not found",
