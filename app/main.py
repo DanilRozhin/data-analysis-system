@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.logging.config import logger, setup_logging
-from app.routers import device_router, health_router, reading_router, user_router
+from app.routers import device_router, health_router, reading_router, stats_router, user_router
 
 setup_logging()
 
@@ -29,6 +29,7 @@ def create_app():
     app_.include_router(user_router)
     app_.include_router(device_router)
     app_.include_router(reading_router)
+    app_.include_router(stats_router)
 
     return app_
 
