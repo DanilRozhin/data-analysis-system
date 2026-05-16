@@ -45,11 +45,22 @@ class UserRepository:
         result = await self.session.execute(query)
         user = result.scalar_one_or_none()
 
-        if user:
-            return UserResponse.model_validate(user)
-        return None
+        if not user:
+            return None
 
-    async def update_last_used(self, user_id: int) -> None:
+        await self.update_last_used(user_id=user_id)
+        await self.session.refresh(user)
+
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "created_at": user.created_at,
+            "last_used": user.last_used,
+        }
+
+        return UserResponse.model_validate(user_data)
+
+    async def update_last_used(self, user_id: uuid.UUID) -> None:
         logs_extra = {
             "method": "update_last_used",
             "service": "user_repository",

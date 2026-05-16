@@ -29,7 +29,7 @@ async def get_user(
 
     except HTTPException:
         logger.error(
-            f"Failed to get user with uuid = {user_id}",
+            f"Failed to get user with uuid = {user_id}, user not found",
             exc_info=False,
             extra={
                 "error_message": "Not found",
