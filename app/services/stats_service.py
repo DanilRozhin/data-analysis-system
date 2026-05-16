@@ -98,7 +98,8 @@ class StatsService:
             if not user:
                 raise HTTPException(status_code=404, detail=f"User with id = {user_id} not found")
 
-            devices = await self.device_repo.get_user_devices(user_id=user_id)
+            result = await self.device_repo.get_user_devices(user_id=user_id)
+            devices = result.devices
 
             if not devices:
                 return UserAggregatedStatsResponse(
