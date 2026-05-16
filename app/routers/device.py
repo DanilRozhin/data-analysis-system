@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
 from app.logging.config import logger
-from app.schemas import DeviceCreate, DeviceResponse
+from app.schemas import DeviceCreate, DeviceResponse, DeviceResponseList
 from app.services import DeviceService
 
 device_router = APIRouter(
@@ -77,6 +77,40 @@ async def create_device(
         logger.error(
             f"(router) Failed to create device with name = {request.name} and user_id = {request.user_id}",
             exc_info=True,
+            extra={
+                "error_message": str(e),
+            },
+        )
+        raise
+
+
+@device_router.get("/user/{user_id}/devices", response_model=DeviceResponseList)
+async def get_user_devices(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_id: uuid.UUID,
+):
+    logger.debug(f"(router) Getting all user devices with user uuid = {user_id}")
+    try:
+        device_service = DeviceService(session=session)
+        devices = await device_service.get_user_devices(user_id=user_id)
+        logger.debug(f"(router) Returned all user devices with user uuid = {user_id}")
+        return devices
+
+    except HTTPException as e:
+        if e.status_code == 404:
+            logger.error(
+                f"Failed to get all user devices with user uuid = {user_id}, user not found",
+                exc_info=False,
+                extra={
+                    "error_message": str(e),
+                },
+            )
+            raise
+
+    except Exception as e:
+        logger.error(
+            f"Failed to get all user devices with user uuid = {user_id}",
+            exc_info=False,
             extra={
                 "error_message": str(e),
             },

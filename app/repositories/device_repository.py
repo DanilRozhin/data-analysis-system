@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Device
 from app.logging.config import logger
-from app.schemas import DeviceResponse
+from app.schemas import DeviceResponse, DeviceResponseList
 
 
 class DeviceRepository:
@@ -54,7 +54,7 @@ class DeviceRepository:
             return DeviceResponse.model_validate(user)
         return None
 
-    async def get_user_devices(self, user_id: uuid.UUID) -> list[DeviceResponse] | None:
+    async def get_user_devices(self, user_id: uuid.UUID) -> DeviceResponseList:
         logs_extra = {
             "method": "get_user_devices",
             "service": "device_repository",
@@ -69,8 +69,26 @@ class DeviceRepository:
         devices = result.scalars().all()
 
         if devices:
-            return [DeviceResponse.model_validate(device) for device in devices]
-        return None
+            devices_list = []
+            for device in devices:
+                devices_list.append(
+                    DeviceResponse(
+                        id=device.id,
+                        name=device.name,
+                        created_at=device.created_at,
+                        last_reading_at=device.last_reading_at,
+                        user_id=device.user_id,
+                        description=device.description,
+                    )
+                )
+            return DeviceResponseList(
+                count=len(devices),
+                devices=devices_list,
+            )
+        return DeviceResponseList(
+            count=len(devices),
+            devices=[],
+        )
 
     async def update_last_reading_time(self, device_id: uuid.UUID) -> None:
         logs_extra = {

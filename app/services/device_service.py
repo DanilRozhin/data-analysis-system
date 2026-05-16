@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories import DeviceRepository, UserRepository
-from app.schemas import DeviceResponse
+from app.schemas import DeviceResponse, DeviceResponseList
 
 
 class DeviceService:
@@ -40,6 +40,21 @@ class DeviceService:
             return await self.device_repo.create_device(
                 user_id=user_id, device_name=device_name, device_description=device_description
             )
+
+        except HTTPException:
+            raise
+
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error"
+            ) from e
+
+    async def get_user_devices(self, user_id: uuid.UUID) -> DeviceResponseList:
+        try:
+            user = await self.user_repo.get_user(user_id)
+            if not user:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id = {user_id} not found")
+            return await self.device_repo.get_user_devices(user_id=user_id)
 
         except HTTPException:
             raise
