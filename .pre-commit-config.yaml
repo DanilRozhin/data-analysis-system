@@ -1,0 +1,50 @@
+# ..pre-commit-config.yaml
+repos:
+  # Базовые хуки для всех проектов
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Проверка YAML файлов
+      - id: check-yaml
+
+      # Добавляет новую строку в конце файла
+      - id: end-of-file-fixer
+
+      # Удаляет лишние пробелы в конце строк
+      - id: trailing-whitespace
+
+      # Проверка JSON файлов
+      - id: check-json
+
+      # Проверка TOML файлов (pyproject.toml)
+      - id: check-toml
+
+      # Поиск случайно закоммиченных приватных ключей
+      - id: detect-private-key
+
+      # Проверка на наличие merge конфликтов
+      - id: check-merge-conflict
+
+      # Проверка синтаксиса Python
+      - id: check-ast
+
+  # UV для зависимостей
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.18
+    hooks:
+      # Обновляет uv.lock при изменении зависимостей
+      - id: uv-lock
+
+  # RUFF - линтер и форматтер
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
+    hooks:
+      # Линтер с автоматическим исправлением
+      - id: ruff
+        args: [
+          --fix,                    # исправлять что можно
+          --exit-non-zero-on-fix,   # если были правки - показать ошибку
+        ]
+
+      # Форматтер кода
+      - id: ruff-format
