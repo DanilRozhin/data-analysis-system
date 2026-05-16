@@ -1,4 +1,4 @@
-# .pre-commit-config.yaml
+# ..pre-commit-config.yaml
 repos:
   # Базовые хуки для всех проектов
   - repo: https://github.com/pre-commit/pre-commit-hooks
