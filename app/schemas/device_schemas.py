@@ -35,3 +35,14 @@ class DeviceResponse(DeviceBase):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DeviceResponseList(BaseModel):
+    count: int = Field(
+        ...,
+        description="Total number of devices user owns",
+    )
+    devices: list[DeviceResponse] = Field(
+        ...,
+        description="List of Devices",
+    )
