@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
 from app.logging.config import logger
-from app.schemas import ReadingCreate, ReadingResponse
+from app.schemas import ReadingCreate, ReadingResponse, ReadingResponseList
 from app.services import ReadingService
 
 reading_router = APIRouter(
@@ -25,12 +25,14 @@ async def create_reading(
     logger.debug(f"(router) Creating reading for device {device_id}")
     try:
         service = ReadingService(session)
-        return await service.create_reading(device_id, request)
+        reading = await service.create_reading(device_id, request)
+        logger.debug(f"(router) Created reading for device {device_id}")
+        return reading
 
     except HTTPException as e:
         if e.status_code == 404:
             logger.error(
-                f"Failed to get device with uuid = {device_id}",
+                f"Failed to get device with uuid = {device_id}, device not found",
                 exc_info=False,
                 extra={
                     "error_message": "Not found",
@@ -50,7 +52,7 @@ async def create_reading(
         raise
 
 
-@reading_router.get("/{device_id}", response_model=list[ReadingResponse])
+@reading_router.get("/{device_id}", response_model=ReadingResponseList)
 async def get_device_readings(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     device_id: uuid.UUID,
@@ -61,12 +63,14 @@ async def get_device_readings(
     logger.debug(f"(router) Getting readings for device {device_id}")
     try:
         service = ReadingService(session)
-        return await service.get_device_readings(device_id, from_date, to_date, limit)
+        result = await service.get_device_readings(device_id, from_date, to_date, limit)
+        logger.debug(f"(router) Found {result.count} readings")
+        return result
 
     except HTTPException as e:
         if e.status_code == 404:
             logger.error(
-                f"Failed to get device with uuid = {device_id}",
+                f"Failed to get device with uuid = {device_id}, device not found",
                 exc_info=False,
                 extra={
                     "error_message": "Not found",

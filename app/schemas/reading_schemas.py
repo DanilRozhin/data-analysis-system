@@ -23,3 +23,16 @@ class ReadingResponse(ReadingBase):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ReadingResponseList(BaseModel):
+    count: int = Field(
+        ...,
+        description="The count of Readings in the list",
+    )
+    readings: list[ReadingResponse] | None = Field(
+        ...,
+        description="The list of Readings",
+    )
+
+    model_config = ConfigDict(from_attributes=True)

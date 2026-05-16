@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Reading
 from app.logging.config import logger
-from app.schemas import ReadingResponse
+from app.schemas import ReadingResponse, ReadingResponseList
 
 
 class ReadingRepository:
@@ -44,7 +44,7 @@ class ReadingRepository:
         from_date: datetime.datetime | None = None,
         to_date: datetime.datetime | None = None,
         limit: int = 50,
-    ) -> list[ReadingResponse]:
+    ) -> ReadingResponseList:
         logs_extra = {
             "method": "get_device_readings",
             "service": "reading_repository",
@@ -65,4 +65,24 @@ class ReadingRepository:
         result = await self.session.execute(query)
         readings = result.scalars().all()
 
-        return [ReadingResponse.model_validate(r) for r in readings]
+        if readings:
+            readings_list = []
+            for reading in readings:
+                readings_list.append(
+                    ReadingResponse(
+                        id=reading.id,
+                        device_id=reading.device_id,
+                        x=reading.x,
+                        y=reading.y,
+                        z=reading.z,
+                        received_at=reading.received_at,
+                    )
+                )
+            return ReadingResponseList(
+                count=len(readings),
+                readings=readings_list,
+            )
+        return ReadingResponseList(
+            count=len(readings),
+            readings=[],
+        )
