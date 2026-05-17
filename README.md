@@ -111,3 +111,8 @@ docker-compose ps
 
 # Остановка
 docker-compose down
+```
+
+## Запуск приложения
+
+Происходит при помощи запуска файла app/main.py
