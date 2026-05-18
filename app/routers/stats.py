@@ -32,7 +32,7 @@ async def get_device_stats(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get device stats with device_uuid = {device_id}, device not found",
                 exc_info=False,
                 extra={
@@ -68,7 +68,7 @@ async def get_user_aggregated_stats(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get aggregated stats for user with uuid: {user_id}, user not found",
                 exc_info=False,
                 extra={

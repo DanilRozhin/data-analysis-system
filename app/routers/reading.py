@@ -31,7 +31,7 @@ async def create_reading(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get device with uuid = {device_id}, device not found",
                 exc_info=False,
                 extra={
@@ -69,7 +69,7 @@ async def get_device_readings(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get device with uuid = {device_id}, device not found",
                 exc_info=False,
                 extra={
