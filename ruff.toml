@@ -47,6 +47,7 @@ exclude = [
     "node_modules",
     "app/database/migrations/**",
     "app/database/models/**",
+    "locustfile.py",
 ]
 # Ошибки, которые могут быть исправлены автоматически
 fixable = [
