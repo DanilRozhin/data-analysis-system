@@ -9,6 +9,7 @@ repos:
 
       # Добавляет новую строку в конце файла
       - id: end-of-file-fixer
+        exclude: 'requirements.txt'
 
       # Удаляет лишние пробелы в конце строк
       - id: trailing-whitespace
