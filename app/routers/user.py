@@ -27,14 +27,15 @@ async def get_user(
         logger.debug(f"(router) Returned user with uuid = {user_id}")
         return user
 
-    except HTTPException:
-        logger.error(
-            f"Failed to get user with uuid = {user_id}, user not found",
-            exc_info=False,
-            extra={
-                "error_message": "Not found",
-            },
-        )
+    except HTTPException as e:
+        if e.status_code == 404:
+            logger.warning(
+                f"Failed to get user with uuid = {user_id}, user not found",
+                exc_info=False,
+                extra={
+                    "error_message": "Not found",
+                },
+            )
         raise
 
     except Exception as e:
@@ -63,7 +64,7 @@ async def create_user(
     except Exception as e:
         logger.error(
             f"(router) Failed to create user with name = {request.name}",
-            exc_info=False,
+            exc_info=True,
             extra={
                 "error_message": str(e),
             },

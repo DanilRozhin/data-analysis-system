@@ -27,20 +27,21 @@ async def get_device(
         logger.debug(f"(router) Returned device with uuid = {device_id}")
         return device
 
-    except HTTPException:
-        logger.error(
-            f"Failed to get device with uuid = {device_id}, device not found",
-            exc_info=False,
-            extra={
-                "error_message": "Not found",
-            },
-        )
+    except HTTPException as e:
+        if e.status_code == 404:
+            logger.warning(
+                f"Failed to get device with uuid = {device_id}, device not found",
+                exc_info=False,
+                extra={
+                    "error_message": "Not found",
+                },
+            )
         raise
 
     except Exception as e:
         logger.error(
             f"Failed to get device with uuid = {device_id}",
-            exc_info=False,
+            exc_info=True,
             extra={
                 "error_message": str(e),
             },
@@ -64,7 +65,7 @@ async def create_device(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get user with uuid = {request.user_id}, device not found",
                 exc_info=False,
                 extra={
@@ -98,7 +99,7 @@ async def get_user_devices(
 
     except HTTPException as e:
         if e.status_code == 404:
-            logger.error(
+            logger.warning(
                 f"Failed to get all user devices with user uuid = {user_id}, user not found",
                 exc_info=False,
                 extra={
@@ -110,7 +111,7 @@ async def get_user_devices(
     except Exception as e:
         logger.error(
             f"Failed to get all user devices with user uuid = {user_id}",
-            exc_info=False,
+            exc_info=True,
             extra={
                 "error_message": str(e),
             },
